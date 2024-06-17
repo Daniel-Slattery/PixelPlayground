@@ -3,7 +3,9 @@ import { useFrame } from '@react-three/fiber';
 import { useKeyboardControls } from '@react-three/drei';
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { throttle } from 'lodash';
 import useGame from './stores/useGame.jsx';
+import socket from './socket';
 
 export default function Player() {
   const body = useRef();
@@ -15,6 +17,34 @@ export default function Player() {
   const [smoothedCameraTarget] = useState(() => new THREE.Vector3());
   const start = useGame((state) => state.start);
   const restart = useGame((state) => state.restart);
+
+  const emitPosition = throttle((position) => {
+    socket.emit('move', { position });
+  }, 100); // Throttle to 10 updates per second
+
+  const prevPosition = useRef({ x: 0, y: 0, z: 0 });
+  const threshold = 0.05; // Adjust this threshold value as needed
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected to server:', socket.id);
+    });
+
+    socket.on('move', (data) => {
+      console.log('Move received:', data);
+      // Handle the move event
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+
+    return () => {
+      socket.off('connect');
+      socket.off('move');
+      socket.off('disconnect');
+    };
+  }, []);
 
   const jump = () => {
     const origin = body.current.translation();
@@ -114,6 +144,16 @@ export default function Player() {
 
     state.camera.position.copy(smoothedCameraPosition);
     state.camera.lookAt(smoothedCameraTarget);
+
+    // Emit the position to the server only if it has changed significantly
+    if (
+      Math.abs(bodyPosition.x - prevPosition.current.x) > threshold ||
+      Math.abs(bodyPosition.y - prevPosition.current.y) > threshold ||
+      Math.abs(bodyPosition.z - prevPosition.current.z) > threshold
+    ) {
+      emitPosition(bodyPosition);
+      prevPosition.current = { ...bodyPosition };
+    }
 
     if (bodyPosition.y < -4) restart();
   });
