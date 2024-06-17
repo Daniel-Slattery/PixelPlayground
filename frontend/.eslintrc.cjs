@@ -1,3 +1,5 @@
+const { default: ts } = require('typescript');
+
 module.exports = {
   ignorePatterns: ['.eslintrc.cjs'],
   env: {
@@ -24,7 +26,6 @@ module.exports = {
     },
   ],
   parser: '@typescript-eslint/parser',
-  extends: ['plugin:@typescript-eslint/recommended'],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
@@ -32,7 +33,15 @@ module.exports = {
       jsx: true,
     },
     project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
   },
-  plugins: ['react'],
-  rules: {},
+  plugins: ['react', '@typescript-eslint', 'jsx-a11y', 'react-hooks', 'prettier'],
+  rules: {
+    'prettier/prettier': 'error',
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
 };
