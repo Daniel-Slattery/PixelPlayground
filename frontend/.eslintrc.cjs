@@ -1,5 +1,3 @@
-const { default: ts } = require('typescript');
-
 module.exports = {
   ignorePatterns: ['.eslintrc.cjs'],
   env: {
@@ -14,17 +12,11 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:prettier/recommended',
   ],
-  overrides: [
-    {
-      env: {
-        node: true,
-      },
-      files: ['.eslintrc.{js,cjs}'],
-      parserOptions: {
-        sourceType: 'script',
-      },
+  settings: {
+    react: {
+      version: 'detect',
     },
-  ],
+  },
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
@@ -38,10 +30,25 @@ module.exports = {
   plugins: ['react', '@typescript-eslint', 'jsx-a11y', 'react-hooks', 'prettier'],
   rules: {
     'prettier/prettier': 'error',
+    'react/react-in-jsx-scope': 'off',
+    'react/no-unknown-property': ['error', { ignore: ['castShadow', 'receiveShadow', 'attach', 'args', 'flatShading'] }],
   },
-  settings: {
-    react: {
-      version: 'detect',
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        '@typescript-eslint/explicit-function-return-type': ['error'],
+      },
     },
-  },
+    {
+      files: ['*.js', '*.jsx'],
+      rules: {
+        '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
+      },
+    },
+  ],
 };

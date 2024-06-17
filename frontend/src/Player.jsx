@@ -23,7 +23,7 @@ export default function Player() {
     const ray = new rapier.Ray(origin, direction);
     const hit = world.castRay(ray, 10, true);
 
-    if (hit.toi < 0.15) {
+    if (hit.timeOfImpact < 0.15) {
       body.current.applyImpulse({ x: 0, y: 0.5, z: 0 });
     }
   };
