@@ -23,16 +23,28 @@ export default function Player() {
   }, 100); // Throttle to 10 updates per second
 
   const prevPosition = useRef({ x: 0, y: 0, z: 0 });
-  const threshold = 0.05; // Adjust this threshold value as needed
+  const threshold = 0.01; // Adjust this threshold value as needed
+
+  const [otherAvatars, setOtherAvatars] = useState({});
 
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Connected to server:', socket.id);
     });
 
-    socket.on('move', (data) => {
-      console.log('Move received:', data);
-      // Handle the move event
+    socket.on('initial-avatars', (avatars) => {
+      setOtherAvatars(avatars);
+    });
+
+    socket.on('avatar-moved', ({ id, position }) => {
+      setOtherAvatars((avatars) => ({ ...avatars, [id]: position }));
+    });
+
+    socket.on('avatar-disconnected', (id) => {
+      setOtherAvatars((avatars) => {
+        const { [id]: _, ...remainingAvatars } = avatars;
+        return remainingAvatars;
+      });
     });
 
     socket.on('disconnect', () => {
@@ -41,7 +53,9 @@ export default function Player() {
 
     return () => {
       socket.off('connect');
-      socket.off('move');
+      socket.off('initial-avatars');
+      socket.off('avatar-moved');
+      socket.off('avatar-disconnected');
       socket.off('disconnect');
     };
   }, []);
@@ -159,20 +173,39 @@ export default function Player() {
   });
 
   return (
-    <RigidBody
-      ref={body}
-      canSleep={false}
-      colliders="ball"
-      restitution={0.2}
-      friction={1}
-      linearDamping={0.5}
-      angularDamping={0.5}
-      position={[0, 1, 0]}
-    >
-      <mesh castShadow>
-        <icosahedronGeometry args={[0.3, 1]} />
-        <meshStandardMaterial flatShading color="mediumpurple" />
-      </mesh>
-    </RigidBody>
+    <>
+      <RigidBody
+        ref={body}
+        canSleep={false}
+        colliders="ball"
+        restitution={0.2}
+        friction={1}
+        linearDamping={0.5}
+        angularDamping={0.5}
+        position={[0, 1, 0]}
+      >
+        <mesh castShadow>
+          <icosahedronGeometry args={[0.3, 1]} />
+          <meshStandardMaterial flatShading color="mediumpurple" />
+        </mesh>
+      </RigidBody>
+      {Object.entries(otherAvatars).map(([id, position]) => (
+        <RigidBody
+          key={id}
+          position={[position.x, position.y, position.z]}
+          canSleep={false}
+          colliders="ball"
+          restitution={0.2}
+          friction={1}
+          linearDamping={0.5}
+          angularDamping={0.5}
+        >
+          <mesh castShadow>
+            <icosahedronGeometry args={[0.3, 1]} />
+            <meshStandardMaterial flatShading color="orange" />
+          </mesh>
+        </RigidBody>
+      ))}
+    </>
   );
 }

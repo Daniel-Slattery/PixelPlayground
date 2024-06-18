@@ -12,19 +12,26 @@ app.get('/', (req, res) => {
   res.send('Socket.io Server for PixelPlayground');
 });
 
+const avatars: { [id: string]: { position: { x: number; y: number; z: number } } } = {};
+
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
-  // Handle user movement
+  // Send the initial state of all avatars to the new client
+  socket.emit('initial-avatars', avatars);
+
+  // Handle new position updates
   socket.on('move', (data) => {
-    console.log('Move:', data);
+    avatars[socket.id] = data.position;
     // Broadcast the movement to other users
-    socket.broadcast.emit('move', data);
+    socket.broadcast.emit('avatar-moved', { id: socket.id, position: data.position });
   });
 
   // Handle user disconnection
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
+    delete avatars[socket.id];
+    io.emit('avatar-disconnected', socket.id);
   });
 });
 
