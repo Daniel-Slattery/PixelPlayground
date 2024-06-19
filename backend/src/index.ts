@@ -12,7 +12,16 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 const server = http.createServer(app);
-const io = new Server(server);
+
+// Apply CORS for Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: "http://pixelplayground.s3-website.eu-west-2.amazonaws.com",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
 
 const port = process.env.PORT || 3001;
 
