@@ -35,5 +35,4 @@ jobs:
       run: |
         cd backend
         eb init -p node.js pixelplayground-backend --region eu-west-2 --platform node.js --no-verify-ssl
-        eb create pixelplayground-backend-env --region eu-west-2
         eb deploy pixelplayground-backend-env --region eu-west-2
