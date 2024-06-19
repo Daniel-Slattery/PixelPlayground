@@ -13,6 +13,7 @@ const socket = io(SERVER_URL, {
   reconnectionDelayMax: 5000,
   timeout: 20000,
   autoConnect: true,
+  withCredentials: true,
 });
 
 export default socket;
