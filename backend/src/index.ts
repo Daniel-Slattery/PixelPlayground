@@ -1,33 +1,18 @@
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import cors from 'cors';
+import { createServer } from "http";
+import { Server } from "socket.io";
 
-// CORS options
-const corsOptions = {
-  origin: 'http://pixelplayground.s3-website.eu-west-2.amazonaws.com',
-  optionsSuccessStatus: 200
-};
-
-const app = express();
-app.use(cors(corsOptions));
-const server = http.createServer(app);
+const httpServer = createServer();
 
 // Apply CORS for Socket.io
-const io = new Server(server, {
+const io = new Server(httpServer, {
   cors: {
     origin: "http://pixelplayground.s3-website.eu-west-2.amazonaws.com",
-    methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
   }
 });
 
 const port = process.env.PORT || 3001;
-
-app.get('/', (req, res) => {
-  res.send('Socket.io Server for PixelPlayground');
-});
 
 const avatars: { [id: string]: { position: { x: number; y: number; z: number } } } = {};
 
@@ -52,6 +37,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
