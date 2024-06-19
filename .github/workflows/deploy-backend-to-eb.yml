@@ -20,7 +20,9 @@ jobs:
 
     - name: Install EB CLI
       run: |
-        sudo pip install awsebcli
+        sudo apt-get update
+        sudo apt-get install -y python3-pip
+        pip3 install awsebcli
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -32,6 +34,6 @@ jobs:
     - name: Deploy to Elastic Beanstalk
       run: |
         cd backend
-        eb init -p node.js my-app --region eu-west-2 --platform node.js --no-verify-ssl
-        eb create my-app-env --region eu-west-2
-        eb deploy my-app-env --region eu-west-2
+        eb init -p node.js pixelplayground-backend --region eu-west-2 --platform node.js --no-verify-ssl
+        eb create pixelplayground-backend-env --region eu-west-2
+        eb deploy pixelplayground-backend-env --region eu-west-2
