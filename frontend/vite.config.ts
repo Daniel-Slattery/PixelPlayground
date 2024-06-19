@@ -1,20 +1,16 @@
 import react from '@vitejs/plugin-react';
-import { transformWithEsbuild } from 'vite';
+import { transformWithEsbuild, defineConfig } from 'vite';
 
-export default {
-  root: 'src/',
-  publicDir: '../public/',
+export default defineConfig({
+  root: './', // Set root to the current directory assuming vite.config.js is in the project root
+  publicDir: 'public', // Adjusted to directly refer to the public directory within the frontend directory
   base: './',
   plugins: [
-    // React support
     react(),
-
-    // .js file support as if it was JSX
     {
       name: 'load+transform-js-files-as-jsx',
-      async transform(code: string, id: string) {
-        if (id?.match(/src\/.*\.js$/) == null) return null;
-
+      async transform(code, id) {
+        if (!id.endsWith('.js')) return null; // Simplified check for .js files in the src directory
         return await transformWithEsbuild(code, id, {
           loader: 'jsx',
           jsx: 'automatic',
@@ -23,17 +19,17 @@ export default {
     },
   ],
   server: {
-    host: true, // Open to local network and display URL
-    open: !('SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in process.env), // Open if it's not a CodeSandbox
+    host: true,
+    open: true, // Simplified to just true for local development
   },
   build: {
-    outDir: '../dist', // Output in the dist/ folder
-    emptyOutDir: true, // Empty the folder first
-    sourcemap: true, // Add sourcemap
+    outDir: 'dist', // Simplified to directly refer to the dist directory within the frontend directory
+    emptyOutDir: true,
+    sourcemap: true,
   },
   resolve: {
     alias: {
-      '@': '/users/daniel.slattery/github/pixelplayground/frontend',
+      '@': '/path/to/frontend/src', // Ensure this path is correctly pointing to your src directory
     },
   },
-};
+});

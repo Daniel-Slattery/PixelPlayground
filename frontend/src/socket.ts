@@ -1,7 +1,9 @@
 import { io } from 'socket.io-client';
 
-// Replace with your backend server URL
-const SERVER_URL = 'http://localhost:3001';
+const SERVER_URL: string =
+  import.meta.env.VITE_BACKEND_URL !== undefined
+    ? import.meta.env.VITE_BACKEND_URL
+    : 'http://localhost:3001';
 
 const socket = io(SERVER_URL, {
   transports: ['websocket'],
