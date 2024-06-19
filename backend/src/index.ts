@@ -1,8 +1,16 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import cors from 'cors';
+
+// CORS options
+const corsOptions = {
+  origin: 'http://pixelplayground.s3-website.eu-west-2.amazonaws.com',
+  optionsSuccessStatus: 200
+};
 
 const app = express();
+app.use(cors(corsOptions));
 const server = http.createServer(app);
 const io = new Server(server);
 
