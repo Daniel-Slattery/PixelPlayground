@@ -3,13 +3,21 @@ import { Server } from "socket.io";
 
 const httpServer = createServer();
 
-// Apply CORS for Socket.io
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://pixelplayground.s3-website.eu-west-2.amazonaws.com",
-    allowedHeaders: ["my-custom-header"],
-    credentials: true
+const io = new Server(httpServer);
+
+// List of allowed origins
+const allowedOrigins = [
+  'http://pixelplayground.s3-website.eu-west-2.amazonaws.com',
+  'http://localhost:5173'
+];
+
+// Disallow connections from outside the specified origins
+io.use((socket, next) => {
+  const origin = socket.handshake.headers.origin;
+  if (origin && !allowedOrigins.includes(origin)) {
+    return next(new Error('origin not allowed'));
   }
+  next();
 });
 
 const port = process.env.PORT || 3001;
