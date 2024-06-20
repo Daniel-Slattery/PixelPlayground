@@ -8,17 +8,17 @@ const httpServer = createServer()
 
 const io = new Server(httpServer)
 
-// Dynamic list of allowed origins based on environment variables
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
+// // Dynamic list of allowed origins based on environment variables
+// const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
 
-// Disallow connections from outside the specified origins
-io.use((socket, next) => {
-  const origin = socket.handshake.headers.origin
-  if (origin && !allowedOrigins.includes(origin)) {
-    return next(new Error('origin not allowed'))
-  }
-  next()
-})
+// // Disallow connections from outside the specified origins
+// io.use((socket, next) => {
+//   const origin = socket.handshake.headers.origin
+//   if (origin && !allowedOrigins.includes(origin)) {
+//     return next(new Error('origin not allowed'))
+//   }
+//   next()
+// })
 
 const port = process.env.PORT || 3001
 
